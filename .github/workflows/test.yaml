@@ -18,6 +18,7 @@ jobs:
       - uses: Xotabu4/selenoid-github-action@v2
         with:
          version: '1.10.7'
+         args: '-limit 10 -tmpfs 128'
         # запускаем тесты
       - run: ./gradlew clean test -Dselenide.remote=http://localhost:4444/wd/hub
 # Скачиваем историю тестов
