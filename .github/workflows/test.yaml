@@ -3,43 +3,62 @@ name: Test
 on: [push]
 
 jobs:
- test:
-      # Где запускаем
+  test:
     runs-on: ubuntu-latest
-    # Что делаем
+
+    # Важно: даём права на запись в репозиторий (для gh-pages)
+    permissions:
+      contents: write
+
     steps:
-      # выкачиваем репозиторий
-      - uses: actions/checkout@v5
-      # настраиваем JAVA
-      - uses: actions/setup-java@v5
+      # 1. Выкачиваем код (самая свежая версия)
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # 2. Устанавливаем Java
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
         with:
-          distribution: 'zulu' # distributions
+          distribution: 'zulu'
           java-version: '17'
-      - uses: Xotabu4/selenoid-github-action@v2
-        with:
-         version: '1.10.7'
-         args: '-limit 10 -tmpfs 128'
-        # запускаем тесты
-      - run: ./gradlew clean test -Dselenide.remote=http://localhost:4444/wd/hub
-# Скачиваем историю тестов
-      - uses: actions/checkout@v5
+
+      # 3. Запускаем Selenoid
+      - name: Start Selenoid
+        uses: Xotabu4/selenoid-github-action@v2
+        # Если не стартует — попробуй явно указать параметры (пример ниже)
+        # with:
+         version: '1.10.7'           # или последняя стабильная
+        args: '-limit 10 -tmpfs 128'
+
+      # 4. Запускаем тесты (selenide.remote уже должен работать)
+      - name: Run Gradle tests
+        run: ./gradlew clean test -Dselenide.remote=http://localhost:4444/wd/hub
+
+      # 5. Скачиваем историю (только если предыдущие шаги прошли или always)
+      - name: Checkout gh-pages (for Allure history)
         if: always()
+        uses: actions/checkout@v5
         continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages
-# генерируем отчет
-      - uses: simple-elf/allure-report-action@master
+
+      # 6. Генерируем Allure отчёт
+      - name: Generate Allure Report
         if: always()
+        uses: simple-elf/allure-report-action@master
         with:
-           gh_pages: gh-pages
-           allure_results: build/allure-results
-           allure_report: allure-report
-           allure_history: allure-history
-# публикуем отчет
-      - uses: peaceiris/actions-gh-pages@v4
+          gh_pages: gh-pages
+          allure_results: build/allure-results
+          allure_report: allure-report
+          allure_history: allure-history
+
+      # 7. Публикуем отчёт в gh-pages
+      - name: Deploy Allure report to GitHub Pages
         if: always()
-        env:
-           PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-           PUBLISH_BRANCH: gh-pages
-           PUBLISH_DIR: allure-history
+        uses: peaceiris/actions-gh-pages@v4   # обновили до v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          # force_orphan: true   # раскомментировать, если нужно чистую историю
