@@ -2,12 +2,20 @@ package less14;
 
 import com.codeborne.selenide.Configuration;
 import com.github.javafaker.Faker;
+import less14.hellper.Attach;
 import less14.pages.RegistrationPage;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static less14.utils.RandomUtils.*;
 
@@ -21,8 +29,17 @@ public class TestFormForStudentsWithPageObjectsAndJavaFaker {
 
     @BeforeAll
     static void config(){
+        Configuration.baseUrl ="https://demoqa.com";
+        Configuration.browser = "chrome";
+        Configuration.browserVersion = "128.0";
         Configuration.browserSize ="1920x1080";
-
+        Configuration.remote = "https://user1:1234@selenoid.autotests.cloud/wd/hub";
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+                "enableVNC",true,
+                "enableVideo", true
+        ));
+        Configuration.browserCapabilities = capabilities;
     }
 
     @BeforeEach
@@ -31,10 +48,17 @@ public class TestFormForStudentsWithPageObjectsAndJavaFaker {
         name = fake.name().firstName();
         lastname =  fake.name().lastName();
         email = fake.internet().emailAddress();
-        phnumber = fake.phoneNumber().phoneNumber();
+        phnumber = fake.phoneNumber().subscriberNumber(10);
         address = fake.address().fullAddress();
     }
 
+    @AfterEach
+    void backLogs(){
+       Attach.sreenshotAs("Last screenshot");
+       Attach.pageSource();
+       Attach.browserConsoleLogs();
+       Attach.addVideo();
+    }
 
     @Test
     void setForm() {
