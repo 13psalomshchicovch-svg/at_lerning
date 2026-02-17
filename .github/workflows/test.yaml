@@ -57,7 +57,7 @@ jobs:
             aerokube/selenoid:latest-release \
             -conf /etc/selenoid/browsers.json \
             -limit 10 \
-            --tmpfs 128
+            
       
           sleep 20
       
