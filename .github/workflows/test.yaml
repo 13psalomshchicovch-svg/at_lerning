@@ -22,24 +22,51 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Prepare Selenoid config
+      - name: Prepare minimal Selenoid config
         run: |
-          curl -sSL https://github.com/aerokube/cm/releases/latest/download/cm_linux_amd64 -o cm
-          chmod +x cm
-          ./cm selenoid configure --browsers chrome,firefox --last-versions 1 --tmpfs 128
-          ls -la .aerokube/selenoid/    
-
-      # 3. Запускаем Selenoid
+          mkdir -p .aerokube/selenoid
+      
+          cat > .aerokube/selenoid/browsers.json << 'EOF'
+          {
+            "chrome": {
+              "default": "latest",
+              "versions": {
+                "latest": {
+                  "image": "selenoid/vnc:chrome_latest",
+                  "port": "4444",
+                  "tmpfs": {"/tmp": "size=512m"}
+                }
+              }
+            }
+          }
+          EOF
+      
+          # Подтягиваем образ заранее (чтобы не ждать в тесте)
+          docker pull selenoid/vnc:chrome_latest || true
+      
+          ls -la .aerokube/selenoid/
+          cat .aerokube/selenoid/browsers.json
+      
       - name: Start Selenoid manually
         run: |
-            docker run -d --name selenoid \
+          docker run -d --name selenoid \
             -p 4444:4444 \
+            --shm-size=2g \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            -v $PWD/.aerokube/selenoid:/root/.aerokube/selenoid \
+            -v ${PWD}/.aerokube/selenoid:/root/.aerokube/selenoid \
             aerokube/selenoid:latest-release \
-            -limit 10 -tmpfs 128
-            sleep 10
-            curl http://localhost:4444/status
+            --conf-dir /root/.aerokube/selenoid \
+            --limit 10 \
+            --tmpfs 128
+      
+          # Ждём, пока Selenoid запустится
+          sleep 15
+      
+          # Проверяем статус (если упадёт — покажет логи)
+          curl --fail http://localhost:4444/status || { docker logs selenoid; exit 1; }
+      
+          echo "Selenoid status:"
+          curl http://localhost:4444/status
 
       # 4. Запускаем тесты (selenide.remote уже должен работать)
       - name: Run Gradle tests
