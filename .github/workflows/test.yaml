@@ -22,13 +22,24 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Prepare Selenoid config
+        run: |
+          curl -sSL https://github.com/aerokube/cm/releases/latest/download/cm_linux_amd64 -o cm
+          chmod +x cm
+          ./cm selenoid configure --browsers chrome,firefox --last-versions 1 --tmpfs 128
+          ls -la .aerokube/selenoid/    
+
       # 3. Запускаем Selenoid
-      - name: Start Selenoid
-        uses: Xotabu4/selenoid-github-action@v2
-        # Если не стартует — попробуй явно указать параметры (пример ниже)
-        with:
-         version: '1.10.7'           # или последняя стабильная
-         args: '-limit 10 -tmpfs 128'
+      - name: Start Selenoid manually
+        run: |
+            docker run -d --name selenoid \
+            -p 4444:4444 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $PWD/.aerokube/selenoid:/root/.aerokube/selenoid \
+            aerokube/selenoid:latest-release \
+            -limit 10 -tmpfs 128
+            sleep 10
+            curl http://localhost:4444/status
 
       # 4. Запускаем тесты (selenide.remote уже должен работать)
       - name: Run Gradle tests
