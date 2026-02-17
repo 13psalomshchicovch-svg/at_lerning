@@ -1,0 +1,20 @@
+0)DATA TESTING
+                {"Ivan, Kuntashov, 13Kent@ya.ru, 25, 15000, CI",
+               "Jeorg, Nastarov, JNas@gm.com, 41, 7000, IT"}
+
+1) Название:
+    В форме добавления сотрудников в таблицу новая запись сотрудника должна отобразиться в конце таблицы по его добавлению
+
+2) Критичность: BLOCKED
+
+3) Предусловие:
+    Отрыть браузер chrome на сайте https://demoqa.com/ и перейти в раздел web-table
+
+4) Шаги:
+    1. Нажать кнопку Add
+    2. Заполнить поля First Name testdata{0} , Last Name testdata{1}, Email testdata{2}, Age testdata{3}, Salary testdata{4}, Department testdata{5}
+    3. Нажать кнопку Submit
+
+5) Ожидаемый результат:
+    В конце таблицы должны появится данные, которые были введены при добавлении сотрудника в колонке
+    First Name testdata{0} , Last Name testdata{1}, Email testdata{2}, Age testdata{3}, Salary testdata{4}, Department testdata{5}
