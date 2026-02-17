@@ -53,9 +53,9 @@ jobs:
             -p 4444:4444 \
             --shm-size=2g \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            -v ${PWD}/.aerokube/selenoid:/root/.aerokube/selenoid \
+            -v ${PWD}/.aerokube/selenoid:/etc/selenoid:ro \   # монтируем в /etc/selenoid (стандартный путь)
             aerokube/selenoid:latest-release \
-            --conf-dir /root/.aerokube/selenoid \
+            -conf /etc/selenoid/browsers.json \   # ← правильный флаг и путь к файлу
             --limit 10 \
             --tmpfs 128
       
