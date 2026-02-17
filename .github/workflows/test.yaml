@@ -26,9 +26,9 @@ jobs:
       - name: Start Selenoid
         uses: Xotabu4/selenoid-github-action@v2
         # Если не стартует — попробуй явно указать параметры (пример ниже)
-        # with:
+        with:
          version: '1.10.7'           # или последняя стабильная
-        args: '-limit 10 -tmpfs 128'
+         args: '-limit 10 -tmpfs 128'
 
       # 4. Запускаем тесты (selenide.remote уже должен работать)
       - name: Run Gradle tests
