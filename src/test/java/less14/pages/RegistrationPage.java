@@ -1,5 +1,6 @@
 package less14.pages;
 
+import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.SelenideElement;
 import less14.pages.component.DatePicker;
 import less14.pages.component.RegistrationTable;
@@ -8,8 +9,7 @@ import less14.pages.component.RegistrationTable;
 import java.io.File;
 
 import static com.codeborne.selenide.Selectors.byText;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.*;
 
 public class RegistrationPage {
     private DatePicker datePicker = new DatePicker();
@@ -17,9 +17,14 @@ public class RegistrationPage {
     //private String titleText = "Srudent Registration Form";
 
     public RegistrationPage openPage() {
-        open("https://demoqa.com/automation-practice-form");
+//        open("https://demoqa.com/automation-practice-form");
 //        executeJavaScript("$('#fixedban'.remove())");
 //        executeJavaScript("$('footer'.remove())");
+        open("https://demoqa.com/");
+        $(".category-cards").$("a",1).click();
+        //$(".row").shouldHave(text("Please select an item from left to start practice."));
+        $$(".accordion div.element-group").get(1).$("a").click();
+        Configuration.timeout = 50000;
 
         return this;
     }

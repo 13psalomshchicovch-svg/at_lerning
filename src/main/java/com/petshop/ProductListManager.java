@@ -15,7 +15,7 @@ public class ProductListManager {
                 return false;
             }
         }
-        products.addLast(productName);
+        products.add(productName);
         return true;
     }
 

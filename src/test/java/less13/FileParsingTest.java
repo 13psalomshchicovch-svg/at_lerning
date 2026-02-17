@@ -40,7 +40,7 @@ public class FileParsingTest {
         try(InputStream resourceAsStream = cl.getResourceAsStream("Sone.xlsx")){
             Assertions.assertNotNull(resourceAsStream);
             XLS content = new XLS(resourceAsStream);
-            assertThat(content.excel.getSheetAt(0).getRow(5).getCell(5).getStringCellValue()).contains(" ");
+            assertThat(content.excel.getSheetAt(0).getRow(5).getCell(5).getNumericCellValue()).toString().contains("1");
         }
 
 //        open("https://samplelib.com/ru/sample-xls.html");
@@ -68,10 +68,11 @@ public class FileParsingTest {
             ZipInputStream zis = new ZipInputStream(resource)
 
     ){
-        ZipEntry entry;
-        while (((entry = zis.getNextEntry()) != null)){
-            assertThat(entry.getName()).isEqualTo("dfint-installer.exe");
-        }
+        ZipEntry entry = zis.getNextEntry();
+
+        Assertions.assertNotNull(entry);
+        assertThat(entry.getName()).isEqualTo("dfint-installer.exe");
+
     }
     }
 

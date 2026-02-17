@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.codeborne.selenide.Selenide.*;
 import static less14.utils.RandomUtils.*;
 
 public class  TestFormForStudentsWithPageObjects {
@@ -23,9 +24,9 @@ public class  TestFormForStudentsWithPageObjects {
         Configuration.browserSize ="1920x1080";
 
     }
-
     @BeforeEach
-    void setUP(){
+    void setUp(){
+
         name = randomString(6);
         lastname =  randomString(8);
         email = randomEmail();
@@ -37,7 +38,7 @@ public class  TestFormForStudentsWithPageObjects {
     @Test
     void setForm() {
 
-        new RegistrationPage().openPage();
+        registrationPage.openPage();
 
         registrationPage.setFirst(name);
         registrationPage
