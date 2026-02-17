@@ -1,19 +1,19 @@
 name: Test
 
-
 on: [push]
+
 jobs:
  test:
-  check-bats-version:
-    # Где запускаем
+      # Где запускаем
     runs-on: ubuntu-latest
     # Что делаем
     steps:
       # выкачиваем репозиторий
       - uses: actions/checkout@v5
-      # настроеваем JAVA
-       uses: actions/setup-java@v5
+      # настраиваем JAVA
+      - uses: actions/setup-java@v5
         with:
           distribution: 'zulu' # distributions
           java-version: '17'
+          # запускаем тесты
       - run: ./gradlew clean test
